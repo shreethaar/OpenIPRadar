@@ -1,0 +1,38 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Rider
+.idea/
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Temp files
+*.tmp
+*.cache
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Secrets
+appsettings.Development.json
+*.pfx
+
+# NuGet
+packages/
+
+# Test Results
+TestResults/
+
+# Publish
+publish/

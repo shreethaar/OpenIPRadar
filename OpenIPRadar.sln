@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.37328.6 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenIPRadar", "OpenIPRadar.csproj", "{B6865A55-7B2B-8DFC-C6FA-D689A0A6AADA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B6865A55-7B2B-8DFC-C6FA-D689A0A6AADA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6865A55-7B2B-8DFC-C6FA-D689A0A6AADA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6865A55-7B2B-8DFC-C6FA-D689A0A6AADA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6865A55-7B2B-8DFC-C6FA-D689A0A6AADA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8A189E2D-042E-49BF-B2BD-4838E6E0CD64}
+	EndGlobalSection
+EndGlobal

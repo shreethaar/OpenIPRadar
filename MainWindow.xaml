@@ -1,0 +1,174 @@
+<Window x:Class="OpenIPRadar.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:OpenIPRadar.Presentation.ViewModels"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
+        Title="OpenIPRadar — Bulk IP Reputation Analysis" Height="720" Width="1200"
+        WindowStartupLocation="CenterScreen">
+    <DockPanel>
+        <!-- Status bar -->
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem>
+                <TextBlock Text="{Binding StatusMessage}" />
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right">
+                <ProgressBar Width="220" Height="16" Minimum="0" Maximum="100"
+                             Value="{Binding ProgressValue, Mode=OneWay}" />
+            </StatusBarItem>
+        </StatusBar>
+
+        <TabControl Margin="8">
+            <!-- ================= SCAN TAB ================= -->
+            <TabItem Header="Scan">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Input -->
+                    <GroupBox Grid.Row="0" Header="Input (paste IPs, or load a TXT/CSV file)">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Height="110" Margin="0,0,8,0"
+                                     Text="{Binding InputText, UpdateSourceTrigger=PropertyChanged}"
+                                     AcceptsReturn="True" TextWrapping="Wrap"
+                                     VerticalScrollBarVisibility="Auto"
+                                     IsEnabled="{Binding IsNotScanning}" />
+                            <StackPanel Grid.Column="1" Width="140">
+                                <Button Content="Load File…" Margin="0,0,0,6" Padding="6,4"
+                                        Command="{Binding LoadFileCommand}" />
+                                <Button Content="Extract IPs" Margin="0,0,0,6" Padding="6,4"
+                                        Command="{Binding ExtractCommand}" />
+                                <Button Content="Clear" Padding="6,4"
+                                        Command="{Binding ClearCommand}" />
+                                <TextBlock Margin="0,8,0,0" TextWrapping="Wrap"
+                                           Text="{Binding ExtractedIps.Count, StringFormat='{}{0} IP(s) ready'}" />
+                            </StackPanel>
+                        </Grid>
+                    </GroupBox>
+
+                    <!-- Providers -->
+                    <GroupBox Grid.Row="1" Header="Providers" Margin="0,8,0,0">
+                        <ItemsControl ItemsSource="{Binding Providers}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:ProviderToggleViewModel}">
+                                    <CheckBox Margin="8,4" VerticalContentAlignment="Center"
+                                              IsChecked="{Binding IsSelected}"
+                                              IsEnabled="{Binding IsConfigured}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" />
+                                            <TextBlock Text="  (no API key)" Foreground="#B00020">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsConfigured}" Value="False">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </CheckBox>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </GroupBox>
+
+                    <!-- Actions -->
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,8">
+                        <Button Content="Scan" Width="110" Padding="6,6" FontWeight="Bold"
+                                Command="{Binding ScanCommand}" />
+                        <Button Content="Cancel" Width="90" Padding="6,6" Margin="8,0,0,0"
+                                Command="{Binding CancelCommand}" />
+                        <Separator Margin="16,0" />
+                        <Button Content="Export HTML" Width="110" Padding="6,6"
+                                Command="{Binding ExportHtmlCommand}" />
+                        <Button Content="Export PDF" Width="110" Padding="6,6" Margin="8,0,0,0"
+                                Command="{Binding ExportPdfCommand}" />
+                    </StackPanel>
+
+                    <!-- Results -->
+                    <DataGrid Grid.Row="3" Margin="0,8,0,0" AutoGenerateColumns="False"
+                              IsReadOnly="True" CanUserAddRows="False"
+                              ItemsSource="{Binding Reports}"
+                              GridLinesVisibility="All" HeadersVisibility="Column">
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Setter Property="Background"
+                                        Value="{Binding RiskLevel, Converter={StaticResource RiskToBrush}}" />
+                            </Style>
+                        </DataGrid.RowStyle>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="IP" Binding="{Binding IpAddress}" />
+                            <DataGridTextColumn Header="Country" Binding="{Binding Country, Converter={StaticResource NullToNa}}" />
+                            <DataGridTextColumn Header="ASN" Binding="{Binding Asn, Converter={StaticResource NullToNa}}" />
+                            <DataGridTextColumn Header="ISP" Binding="{Binding Isp, Converter={StaticResource NullToNa}}" />
+                            <DataGridTextColumn Header="Hostname" Binding="{Binding Hostname, Converter={StaticResource NullToNa}}" />
+                            <DataGridTextColumn Header="Abuse Conf." Binding="{Binding AbuseConfidence, Converter={StaticResource NullToNa}}" />
+                            <DataGridTextColumn Header="Reports" Binding="{Binding Reports, Converter={StaticResource NullToNa}}" />
+                            <DataGridTextColumn Header="Last Reported" Binding="{Binding LastReported, Converter={StaticResource NullToNa}}" />
+                            <DataGridTextColumn Header="VT Rep." Binding="{Binding VtReputation, Converter={StaticResource NullToNa}}" />
+                            <DataGridTextColumn Header="VT Mal." Binding="{Binding VtMalicious, Converter={StaticResource NullToNa}}" />
+                            <DataGridTextColumn Header="VT Susp." Binding="{Binding VtSuspicious, Converter={StaticResource NullToNa}}" />
+                            <DataGridTextColumn Header="Open Ports" Binding="{Binding OpenPorts, Converter={StaticResource NullToNa}}" />
+                            <DataGridTextColumn Header="OS" Binding="{Binding OperatingSystem, Converter={StaticResource NullToNa}}" />
+                            <DataGridTextColumn Header="Tags" Binding="{Binding Tags, Converter={StaticResource NullToNa}}" />
+                            <DataGridTextColumn Header="Threat Score" Binding="{Binding ThreatScore}" FontWeight="Bold" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- ================= SETTINGS TAB ================= -->
+            <TabItem Header="Settings">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl Margin="8" ItemsSource="{Binding Settings.Providers}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type vm:ProviderKeyViewModel}">
+                                <GroupBox Header="{Binding DisplayName}" Margin="0,0,0,10">
+                                    <Grid Margin="4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+
+                                        <TextBox Grid.Row="0" Grid.Column="0" Margin="0,0,8,0"
+                                                 VerticalContentAlignment="Center"
+                                                 Text="{Binding ApiKey, UpdateSourceTrigger=PropertyChanged}" />
+                                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                                            <Button Content="Save" Width="70" Padding="4" Command="{Binding SaveCommand}" />
+                                            <Button Content="Test" Width="70" Padding="4" Margin="6,0,0,0" Command="{Binding TestCommand}" />
+                                            <Button Content="Clear" Width="70" Padding="4" Margin="6,0,0,0" Command="{Binding ClearCommand}" />
+                                        </StackPanel>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,6,0,0"
+                                                   Foreground="#444" Text="{Binding Status}" />
+                                    </Grid>
+                                </GroupBox>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</Window>
