@@ -17,7 +17,7 @@ A Windows desktop application for bulk IP reputation analysis. Paste a list of I
 
 ## Screenshots
 
-> _Add screenshots here once the application is running._
+![screenshot](./images/screenshot.png)
 
 ## Requirements
 
